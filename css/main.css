@@ -1,0 +1,31 @@
+body {
+    text-align: center;
+    background-image: url("assets/willem-van-de-velde-94074.jpg");
+}
+
+#board {
+    display: flex;
+    height: 370px;
+    width: 370px;
+    margin: auto;
+    border: 1px solid black;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.square{
+    display: flex;
+    border: 1px solid black;
+    width: 35px; 
+    height: 35px; 
+    justify-content: center;
+    align-items: center;
+}
+
+#message-box{
+    height: 75px;
+}
+
+button {
+    margin: 0 auto;
+}
