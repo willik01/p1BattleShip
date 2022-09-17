@@ -1,7 +1,6 @@
 body {
     text-align: center;
-    background-image: url("/Users/keithw/GA/code/p1BattleShip/assets/willem-van-de-velde-94074.jpg");
-    /* background-image: url("/assets/willem-van-de-velde-94074.jpg"); */
+    background-image: url("../assets/willem-van-de-velde-94074-2.jpg");
 }
 
 #board {
@@ -12,6 +11,8 @@ body {
     border: 1px solid black;
     align-items: center;
     flex-wrap: wrap;
+    background-image: url("../assets/waterBig.png");
+    background-size: 100%;
 }
 
 .square{
@@ -21,6 +22,25 @@ body {
     height: 35px; 
     justify-content: center;
     align-items: center;
+    
+}
+
+/* mouse over link */
+.square:hover {
+    opacity: .1;
+    background-color: white;
+  }
+
+.test{
+    display: flex;
+    border: 1px solid black;
+    width: 35px; 
+    height: 35px; 
+    justify-content: center;
+    align-items: center;
+    background-image: url("../assets/hit.png");
+    background-size: 100% 100%;
+
 }
 
 #message-box{
