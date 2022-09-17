@@ -1,6 +1,7 @@
 body {
     text-align: center;
-    background-image: url("assets/willem-van-de-velde-94074.jpg");
+    background-image: url("/Users/keithw/GA/code/p1BattleShip/assets/willem-van-de-velde-94074.jpg");
+    /* background-image: url("/assets/willem-van-de-velde-94074.jpg"); */
 }
 
 #board {
