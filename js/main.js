@@ -10,22 +10,31 @@ const SHIPS = [
     {name: 'Patrol Boat', length:2},
 ]
 
-const SHIP_LOCATIONS_P1 = [
-    {name: SHIPS[0].name, location: ['r1c1', 'r1c2', 'r1c3', 'r1c4']},
-    {name: SHIPS[1].name, location: ['r3c4', 'r3c5', 'r3c6', 'r3c7', 'r3c8']},
-    {name: SHIPS[2].name, location: ['r4c4', 'r4c5', 'r4c6']},
-    {name: SHIPS[3].name, location: ['r8c1', 'r9c1', 'r10c1']},
-    {name: SHIPS[4].name, location: ['r10c9', 'r10c10']},
-]
+// const SHIP_LOCATIONS_P1 = [
+//     {name: SHIPS[0].name, location: ['r1c1', 'r1c2', 'r1c3', 'r1c4']},
+//     {name: SHIPS[1].name, location: ['r3c4', 'r3c5', 'r3c6', 'r3c7', 'r3c8']},
+//     {name: SHIPS[2].name, location: ['r4c4', 'r4c5', 'r4c6']},
+//     {name: SHIPS[3].name, location: ['r8c1', 'r9c1', 'r10c1']},
+//     {name: SHIPS[4].name, location: ['r10c9', 'r10c10']},
+// ]
 // player object (stores plyer info. Who is x/y, win/lose/tie count)
 // win criteria - sum of all boat lengths...?
 class  Player {
-    constructor(shotsAllowed) {
-        this.shotsAllowed = shotsAllowed
-        this.score = 0;
+    constructor(name, shotsAllowed) {
+        this.name = name;
+        this.shotsAllowed = shotsAllowed;
         //this.shotsFired = 0;
         this.hits = 0;
         this.misses = 0;
+        this.wins = 0;
+        this.losses = 0;
+        this.shipLocations = [
+            {name: SHIPS[0].name, location: ['r1c2', 'r1c3', 'r1c4', 'r1c5']},
+            {name: SHIPS[1].name, location: ['r3c4', 'r3c5', 'r3c6', 'r3c7', 'r3c8']},
+            {name: SHIPS[2].name, location: ['r4c4', 'r4c5', 'r4c6']},
+            {name: SHIPS[3].name, location: ['r8c1', 'r9c1', 'r10c1']},
+            {name: SHIPS[4].name, location: ['r10c9', 'r10c10']},
+        ]
     }
     recordHit() {
         this.hits +=1;
@@ -34,11 +43,16 @@ class  Player {
         this.misses +=1;
     }
     recordWin() {
-        this.score +=1;
+        this.wins +=1;
+    }
+    recordLoss() {
+        this.losses +=1;
+    }
+    reset() {
+        this.hits = 0;
+        this.misses = 0;
     }
 }
-//Instantiate payer 1
-let player1 = new Player (NUM_SHOTS);
 
 /*----- app's state (variables) -----*/
 // let score = 0;
@@ -48,6 +62,9 @@ let player1 = new Player (NUM_SHOTS);
 //- board state
 //- board = array of 100 or nested array of 10 rows, 10 columns?
 //- number of shots/hits/misses
+//Instantiate payer 1
+let player1 = new Player ("Keith", NUM_SHOTS);
+let currentPlayer = player1;
 
 /*----- cached element references -----*/
 const shotsLeftEl = document.getElementById('sl');
@@ -62,7 +79,7 @@ resetBtnEl.addEventListener('click', handleResetClick);
 boardEl.addEventListener('click', handleBoardClick)
 
 /*----- functions -----*/
-// 
+
 function initGame(){
     //first clear board
     if (boardEl.hasChildNodes()) {
@@ -71,12 +88,10 @@ function initGame(){
         }
     }
     createBoard();
-    player1.hits = 0;
-    player1.misses = 0;
-    shotsLeftEl.innerText = player1.shotsAllowed - player1.hits - player1.misses;
-    hitsEl.innerText = player1.hits;
-    missesEl.innerText = player1.misses;
-
+    currentPlayer.reset();
+    shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+    hitsEl.innerText = currentPlayer.hits;
+    missesEl.innerText = currentPlayer.misses;
 }
 
 function createBoard() {
@@ -90,6 +105,12 @@ function createBoard() {
     }
 }
 
+function randomlyPlaceShips(player, boardWidth) {
+        return Math.floor((Math.random() * boardWidth)+1);
+        console.log (Math.floor(Math.random() * boardWidth)+1);
+}
+
+//Click handlers (board clicks and reset button)
 function handleResetClick() {
   initGame();
 }
@@ -104,29 +125,29 @@ function handleBoardClick(evt) {
         // console.log('square id: ', evt.target.id, 'locations',SHIP_LOCATIONS_P1[0].location);
     }
 }
-
+//Render DOM and determine if shot was a hit
 function renderShot(boardCoordinate, targetSquare) {
-    if (SHIP_LOCATIONS_P1[0].location.includes(boardCoordinate) ||
-        SHIP_LOCATIONS_P1[1].location.includes(boardCoordinate) ||
-        SHIP_LOCATIONS_P1[2].location.includes(boardCoordinate) ||
-        SHIP_LOCATIONS_P1[3].location.includes(boardCoordinate) ||
-        SHIP_LOCATIONS_P1[4].location.includes(boardCoordinate)
+    if (currentPlayer.shipLocations[0].location.includes(boardCoordinate) ||
+        currentPlayer.shipLocations[1].location.includes(boardCoordinate) ||
+        currentPlayer.shipLocations[2].location.includes(boardCoordinate) ||
+        currentPlayer.shipLocations[3].location.includes(boardCoordinate) ||
+        currentPlayer.shipLocations[4].location.includes(boardCoordinate)
         ) {
         targetSquare.style.backgroundImage = "url('assets/hit.png')";
-        player1.recordHit(); //this has to change with multiPlayer
+        currentPlayer.recordHit(); //this has to change with multiPlayer
     } else {
         targetSquare.style.backgroundImage = "url('assets/miss.png')";
-        player1.recordMiss(); //this has to change with multiPlayer
+        currentPlayer.recordMiss(); //this has to change with multiPlayer
     }
-    shotsLeftEl.innerText = player1.shotsAllowed - player1.hits - player1.misses;
-    hitsEl.innerText = player1.hits;
-    missesEl.innerText = player1.misses;
-    if (player1.hits === 17) {
-        messageDisplayEl.innerHTML = `<strong>Player One WINS!!!!</strong>`;
-        player1.recordWin();  //this has to change with multiPlayer
+    shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+    hitsEl.innerText = currentPlayer.hits;
+    missesEl.innerText = currentPlayer.misses;
+    if (currentPlayer.hits === 17) {
+        messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} WINS!!!!</strong>`;
+        currentPlayer.recordWin();  //this has to change with multiPlayer
     }
-    if ((player1.hits + player1.misses) === 50) {
-        messageDisplayEl.innerHTML = `<strong>Player One loses!  BOOOOO!!!</strong>`;
+    if ((currentPlayer.hits + currentPlayer.misses) === 50) {
+        messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} loses!  BOOOOO!!!</strong>`;
     }
 }
 
