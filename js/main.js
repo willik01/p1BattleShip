@@ -8,15 +8,8 @@ const SHIPS = [
     {name: 'Destroyer', length:3},
     {name: 'Submarine', length:3},
     {name: 'Patrol Boat', length:2},
-]
+];
 
-// const SHIP_LOCATIONS_P1 = [
-//     {name: SHIPS[0].name, location: ['r1c1', 'r1c2', 'r1c3', 'r1c4']},
-//     {name: SHIPS[1].name, location: ['r3c4', 'r3c5', 'r3c6', 'r3c7', 'r3c8']},
-//     {name: SHIPS[2].name, location: ['r4c4', 'r4c5', 'r4c6']},
-//     {name: SHIPS[3].name, location: ['r8c1', 'r9c1', 'r10c1']},
-//     {name: SHIPS[4].name, location: ['r10c9', 'r10c10']},
-// ]
 // player object (stores plyer info. Who is x/y, win/lose/tie count)
 // win criteria - sum of all boat lengths...?
 class  Player {
@@ -67,17 +60,18 @@ let player1 = new Player ("Keith", NUM_SHOTS);
 let currentPlayer = player1;
 
 /*----- cached element references -----*/
-const shotsLeftEl = document.getElementById('sl');
-const hitsEl = document.getElementById('hits');
-const missesEl = document.getElementById('misses');
+let shotsLeftEl = document.getElementById('sl');
+let hitsEl = document.getElementById('hits');
+let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
 const resetBtnEl = document.getElementById('resetBtn');
 const boardEl = document.getElementById('board');
+const showShipsBtnEl = document.getElementById('showShips');
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
-boardEl.addEventListener('click', handleBoardClick)
-
+boardEl.addEventListener('click', handleBoardClick);
+showShipsBtnEl.addEventListener('click', (handleShowShips));
 /*----- functions -----*/
 
 function initGame(){
@@ -89,9 +83,15 @@ function initGame(){
     }
     createBoard();
     currentPlayer.reset();
-    shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
-    hitsEl.innerText = currentPlayer.hits;
-    missesEl.innerText = currentPlayer.misses;
+    messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
+    //resent element references
+    shotsLeftEl = document.getElementById('sl');
+    hitsEl = document.getElementById('hits');
+    missesEl = document.getElementById('misses');
+
+    // shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+    // hitsEl.innerText = currentPlayer.hits;
+    // missesEl.innerText = currentPlayer.misses;
 }
 
 function createBoard() {
@@ -110,7 +110,7 @@ function randomlyPlaceShips(player, boardWidth) {
         console.log (Math.floor(Math.random() * boardWidth)+1);
 }
 
-//Click handlers (board clicks and reset button)
+//Click handler functions (board clicks, reset button, reveal ship locations)
 function handleResetClick() {
   initGame();
 }
@@ -122,8 +122,20 @@ function handleBoardClick(evt) {
     if (evt.target.id !== 'board') {
         //Check for hit
         renderShot(evt.target.id, evt.target);
-        // console.log('square id: ', evt.target.id, 'locations',SHIP_LOCATIONS_P1[0].location);
     }
+}
+
+function handleShowShips(){
+
+// NEED TO FIGURE OUT HOW TO determine which player. 
+
+    player1.shipLocations.forEach(ships => {
+        ships.location.forEach(squareId => {
+            console.log(squareId);
+            console.log(document.getElementById(squareId));
+            document.getElementById(squareId).style.backgroundImage = "url('assets/water.png')";
+        })
+    });
 }
 //Render DOM and determine if shot was a hit
 function renderShot(boardCoordinate, targetSquare) {
@@ -134,17 +146,23 @@ function renderShot(boardCoordinate, targetSquare) {
         currentPlayer.shipLocations[4].location.includes(boardCoordinate)
         ) {
         targetSquare.style.backgroundImage = "url('assets/hit.png')";
-        currentPlayer.recordHit(); //this has to change with multiPlayer
+        targetSquare.style.pointerEvents = 'none';
+        currentPlayer.recordHit(); 
     } else {
         targetSquare.style.backgroundImage = "url('assets/miss.png')";
-        currentPlayer.recordMiss(); //this has to change with multiPlayer
+        targetSquare.style.pointerEvents = 'none';
+        currentPlayer.recordMiss(); 
     }
+    
+    //update message bar
     shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
     hitsEl.innerText = currentPlayer.hits;
     missesEl.innerText = currentPlayer.misses;
+    
+    //determine if there is a win or loss
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} WINS!!!!</strong>`;
-        currentPlayer.recordWin();  //this has to change with multiPlayer
+        currentPlayer.recordWin();  
     }
     if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} loses!  BOOOOO!!!</strong>`;
