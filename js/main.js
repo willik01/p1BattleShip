@@ -59,6 +59,7 @@ class  Player {
 let player1 = new Player ("Keith", NUM_SHOTS);
 let player2 = new Player ("Zev", NUM_SHOTS);
 let currentPlayer = player1;
+randomlyPlaceShips(currentPlayer);
 
 /*----- cached element references -----*/
 let shotsLeftEl = document.getElementById('sl');
@@ -127,23 +128,18 @@ function randomlyPlaceShips(player) {
         tempShipLocationArr.length = 0;
         for (let locationIdx=0; locationIdx<SHIPS[shipIdx].length; locationIdx++) {
             if (directionOfShip) {
-                console.log('direction', directionOfShip, 'row increment')
-                // player.shipLocations[shipIdx].location[locationIdx] = `r${startPositionX + locationIdx}c${startPositionY}`
                 tempShipLocationArr.push(`r${startPositionX + locationIdx}c${startPositionY}`)
+                //check if new locaiton conflicts with other boats. If so, start over. 
+                if (checkHit(`r${startPositionX + locationIdx}c${startPositionY}`)){
+                    doNotIncrement = true;
+                }
             } else {
-                console.log('direction', directionOfShip, 'column increment')
-                // player.shipLocations[shipIdx].location[locationIdx] = `r${startPositionX}c${startPositionY + locationIdx}`
                 tempShipLocationArr.push(`r${startPositionX}c${startPositionY + locationIdx}`)
+                //check if new locaiton conflicts with other boats. If so, start over. 
+                if (checkHit(`r${startPositionX}c${startPositionY + locationIdx}`)){
+                    doNotIncrement = true;
+                }
             }    
-            //check if new locaiton conflicts with other boats. If so, start over. 
-            if (player.shipLocations[0].location.includes(`r${startPositionX}c${startPositionY + locationIdx}`) ||
-                player.shipLocations[1].location.includes(`r${startPositionX}c${startPositionY + locationIdx}`) ||
-                player.shipLocations[2].location.includes(`r${startPositionX}c${startPositionY + locationIdx}`) ||
-                player.shipLocations[3].location.includes(`r${startPositionX}c${startPositionY + locationIdx}`) ||
-                player.shipLocations[4].location.includes(`r${startPositionX}c${startPositionY + locationIdx}`)
-            ) {
-                doNotIncrement = true;
-            }        
         };
         //if no conflicts, move to next ship
         if (!doNotIncrement) {
@@ -155,45 +151,6 @@ function randomlyPlaceShips(player) {
         }
     };
 }
-// WORKING VERSION BELOW
-// function randomlyPlaceShips(player) {
-//     //for each player's ship locations
-//         player.shipLocations.forEach((ship, shipIdx) => {
-//             //generate random start/direction
-//             const directionOfShip = getShipDirection(); // zero = start->down, 1=start->right
-//             let startPositionX = null;
-//             let startPositionY = null;
-//             //generate start position - decrement by length of ship for the direction of ship
-//             if (directionOfShip) {
-//                 startPositionX = getShipStartPositionX(BOARD_WIDTH - SHIPS[shipIdx].length);
-//                 startPositionY = getShipStartPositionY(BOARD_HEIGHT);
-//             } else {
-//                 startPositionX = getShipStartPositionX(BOARD_WIDTH);
-//                 startPositionY = getShipStartPositionY(BOARD_HEIGHT - SHIPS[shipIdx].length);
-//             }
-    
-//     // record the new location based on a random start point and direction (down or right)
-//             //loop through length of ship to record locations for whole ship
-//             for (let locationIdx=0; locationIdx<SHIPS[shipIdx].length; locationIdx++) {
-//                 if (directionOfShip) {
-//                     console.log('direction', directionOfShip, 'row increment')
-    
-//                     player.shipLocations[shipIdx].location[locationIdx] = `r${startPositionX + locationIdx}c${startPositionY}`
-//                 } else {
-//                     console.log('direction', directionOfShip, 'column increment')
-//                     player.shipLocations[shipIdx].location[locationIdx] = `r${startPositionX}c${startPositionY + locationIdx}`
-//                 }            
-//             };
-//         });
-//     }
-// console.log('ship: ',ship, 'startX: ', startPositionX, 'startY: ', startPositionY, 'direction: ', directionOfShip );
-// console.log('player.shipLoc: ', player.shipLocations, 'player.shiploc.loc', player.shipLocations[shipIdx].location[locationIdx])
-
-
-//**********************************
-// can't conflict with other ships
-// can't go out of bounds/border
-//**********************************
 
 function getShipStartPositionX(boardWidth) {
     return Math.floor((Math.random() * boardWidth)+1);
@@ -228,7 +185,7 @@ function handleShowShips(){
 // NEED TO FIGURE OUT HOW TO determine which player. 
 // *************************************************
 // cheat mode to display ship locations
-    player1.shipLocations.forEach(ships => {
+    currentPlayer.shipLocations.forEach(ships => {
         ships.location.forEach(squareId => {
             console.log(squareId);
             console.log(document.getElementById(squareId));
