@@ -55,18 +55,10 @@ class  Player {
 }
 
 /*----- app's state (variables) -----*/
-// let score = 0;
-// let shotsFired = 0;
-// let hits = 0;
-// let misses = 0;
-//- board state
-//- board = array of 100 or nested array of 10 rows, 10 columns?
-//- number of shots/hits/misses
-//Instantiate payer 1
+//Instantiate payers
 let player1 = new Player ("Keith", NUM_SHOTS);
 let player2 = new Player ("Zev", NUM_SHOTS);
 let currentPlayer = player1;
-randomlyPlaceShips(currentPlayer);
 
 /*----- cached element references -----*/
 let shotsLeftEl = document.getElementById('sl');
@@ -83,6 +75,15 @@ boardEl.addEventListener('click', handleBoardClick);
 showShipsBtnEl.addEventListener('click', (handleShowShips));
 /*----- functions -----*/
 
+//
+//
+//
+// move this back into Init after testing
+randomlyPlaceShips(currentPlayer);
+// move this back into Init after testing
+//
+//
+//
 function initGame(){
     //first clear board
     if (boardEl.hasChildNodes()) {
@@ -97,6 +98,7 @@ function initGame(){
     shotsLeftEl = document.getElementById('sl');
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
+    randomlyPlaceShips(currentPlayer);
 }
 
 function createBoard() {
@@ -178,7 +180,7 @@ function handleResetClick() {
 }
 
 function handleBoardClick(evt) {
-     console.log('evt.target: ', evt.target);
+    //  console.log('evt.target: ', evt.target);
     // if (!winner) {return};
 
     if (evt.target.id !== 'board') {
@@ -188,12 +190,12 @@ function handleBoardClick(evt) {
 }
 
 function handleShowShips(){
-// *************************************************
-// NEED TO FIGURE OUT HOW TO determine which player. 
-// *************************************************
-// cheat mode to display ship locations
+// end of game reveal of ships & cheat mode to display ship locations
 currentPlayer.shipLocations.forEach((ships, idx) => {
     document.getElementById(ships.location[0]).innerHTML = `<img src='assets/s_${ships.name}.png' alt='${ships.name}' width='${(SHIPS[idx].length * 36)}' height='auto'>)`
+//
+//    document.getElementById(ships.location[0]).style.backgroundImage = "url('assets/hit.png')";
+//
         if ( currentPlayer.shipDirection[idx].direction === 1 ) {
             document.getElementById(ships.location[0]).style.transform = 'rotate(90deg)';
         }
@@ -202,7 +204,7 @@ currentPlayer.shipLocations.forEach((ships, idx) => {
 //check to see if clicked square is in the player's ship list
 function checkHit (boardCoordinate) {
     let foundShip = false;
-    currentPlayer.shipLocations.forEach((shipObj, idx) => {
+    currentPlayer.shipLocations.forEach((shipObj) => {
         if(shipObj.location.includes(boardCoordinate)) {
             foundShip = true;
         } 
@@ -211,7 +213,7 @@ function checkHit (boardCoordinate) {
 }
 
 function shipSunk() {
-    
+
 }
 
 //Render DOM and determine if shot was a hit
@@ -235,9 +237,11 @@ function renderShot(boardCoordinate, targetSquare) {
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} WINS!!!!</strong>`;
         currentPlayer.recordWin();  
+        handleShowShips();
     }
     if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} loses!  BOOOOO!!!</strong>`;
+        handleShowShips();
     }
 }
 
