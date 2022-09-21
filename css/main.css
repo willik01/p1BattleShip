@@ -25,6 +25,8 @@ body {
     background-size: 70%;   
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 0;
+    position: relative; 
 }
 
 /* mouse over link */
