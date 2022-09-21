@@ -10,14 +10,27 @@
 </head>
 <body>
     <h1>The Game of Battleshippy</h1>
-    <h2 id="messageDisplay">Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span></h2>
+    <div class="twoPlayerBoard1">
+        <h2 id="messageDisplay1">Shots Left: <span id="sl1">0</span>&nbsp;Hits: <span id="hits1">0</span>&nbsp;Misses: <span id="misses1">0</span></h2>
+        <div id="board1">
+            <!-- Board generated here -->
     
-    <div id="board">
-        <!-- Board generated here -->
+        </div>
+        <button id="resetBtn1">Reset</button>
+        <br>
+        <button id="showShips1" >Show Ships</button>
+    </div>
+    <div class="twoPlayerBoard2" hidden>
+
+        <h2 id="messageDisplay2">Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span></h2> 
+        <div id="board2">
+            <!-- Board generated here -->
+    
+        </div>
+        <button id="resetBtn2">Reset</button>
+        <br>
+        <button id="showShips2" >Show Ships</button>
 
     </div>
-    <button id="resetBtn">Reset</button>
-    <br>
-    <button id="showShips" >Show Ships</button>
 </body
 </html>
