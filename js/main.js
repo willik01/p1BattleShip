@@ -61,13 +61,23 @@ let player2 = new Player ("Zev", NUM_SHOTS);
 let currentPlayer = player1;
 
 /*----- cached element references -----*/
-let shotsLeftEl = document.getElementById('sl');
-let hitsEl = document.getElementById('hits');
-let missesEl = document.getElementById('misses');
-const messageDisplayEl = document.getElementById('messageDisplay');
-const resetBtnEl = document.getElementById('resetBtn');
-const boardEl = document.getElementById('board');
-const showShipsBtnEl = document.getElementById('showShips');
+//Board 1
+let shotsLeftEl = document.getElementById('sl1');
+let hitsEl = document.getElementById('hits1');
+let missesEl = document.getElementById('misses1');
+const messageDisplayEl1 = document.getElementById('messageDisplay1');
+const resetBtnEl1 = document.getElementById('resetBtn1');
+const boardEl1 = document.getElementById('board1');
+const showShipsBtnEl1 = document.getElementById('showShips1');
+
+//Board 2
+let shotsLeftEl = document.getElementById('sl2');
+let hitsEl = document.getElementById('hits2');
+let missesEl = document.getElementById('misses2');
+const messageDisplayEl1 = document.getElementById('messageDisplay2');
+const resetBtnEl1 = document.getElementById('resetBtn2');
+const boardEl1 = document.getElementById('board2');
+const showShipsBtnEl1 = document.getElementById('showShips2');
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
