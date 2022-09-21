@@ -20,8 +20,6 @@ body {
     border: 1px solid black;
     width: 35px; 
     height: 35px; 
-    /* justify-content: center; */
-    /* align-items: center; */
     background-size: 70%;   
     background-repeat: no-repeat;
     background-position: center;
@@ -34,17 +32,6 @@ body {
     background-color: red;
   }
 
-/* .test{
-    display: flex;
-    border: 1px solid black;
-    width: 35px; 
-    height: 35px; 
-    justify-content: center;
-    align-items: center;
-    background-image: url("../assets/hit.png");
-    background-size: 100% 100%;
-} */
-
 #message-box{
     height: 75px;
 }
@@ -52,3 +39,7 @@ body {
 button {
     margin: 0 auto;
 }
+/* pointer-events avoids 'board' click on the image vs. the square */
+img {
+    pointer-events: none;
+  }
