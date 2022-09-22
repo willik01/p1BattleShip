@@ -236,13 +236,12 @@ function renderShot(boardCoordinate, targetSquare) {
     
     //determine if there is a win or loss
     if (currentPlayer.hits === 17) {
-        messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} WINS!!!!</strong>`;
+        messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordWin();  
-        ShowShips();
         boardEl.style.pointerEvents = 'none';
     }
-    if ((currentPlayer.hits + currentPlayer.misses) === 50) {
-        messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} loses!  BOOOOO!!!</strong>`;
+    if ((currentPlayer.hits + currentPlayer.misses) > 50) {
+        messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         ShowShips();
         boardEl.style.pointerEvents = 'none';
     }
