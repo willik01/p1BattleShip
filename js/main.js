@@ -11,7 +11,6 @@ const SHIPS = [
 ];
 
 // player object (stores plyer info. Who is x/y, win/lose/tie count)
-// win criteria - sum of all boat lengths...?
 class  Player {
     constructor(name, shotsAllowed) {
         this.name = name;
@@ -68,58 +67,33 @@ let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
 const resetBtnEl = document.getElementById('resetBtn');
 const boardEl = document.getElementById('board');
-const showShipsBtnEl = document.getElementById('showShips');
-
-//Board 2
-let shotsLeftEl2 = document.getElementById('sl2');
-let hitsEl2 = document.getElementById('hits2');
-let missesEl2 = document.getElementById('misses2');
-const messageDisplayEl2 = document.getElementById('messageDisplay2');
-const resetBtnEl2 = document.getElementById('resetBtn2');
-const boardEl2 = document.getElementById('board2');
-const showShipsBtnEl2 = document.getElementById('showShips2');
 
 /*----- event listeners -----*/
-// board 1
 resetBtnEl.addEventListener('click', handleResetClick);
 boardEl.addEventListener('click', handleBoardClick);
-showShipsBtnEl.addEventListener('click', (handleShowShips));
-//board 2
-resetBtnEl2.addEventListener('click', handleResetClick);
-boardEl2.addEventListener('click', handleBoardClick);
-showShipsBtnEl2.addEventListener('click', (handleShowShips));
+
 /*----- functions -----*/
 
-//
-//
-//
-// move this back into Init after testing
-randomlyPlaceShips(currentPlayer);
-// move this back into Init after testing
-//
-//
-//
-function initGame(){ //add player input for 1 player vs. 2 player - init as required 
+function initGame(){ 
     //first clear board
     if (boardEl.hasChildNodes()) {
         while (boardEl.hasChildNodes()) {
             boardEl.removeChild(boardEl.firstChild);
         }
     }
-    createBoard(boardEl); //do once for each board, passing the boardEl and board El2
-    currentPlayer.reset(); //reset both player
+    createBoard(boardEl);
+    currentPlayer.reset();
 
-    //create function for these resets - need to do for both board in 2player
     messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
     //reset element references
     shotsLeftEl = document.getElementById('sl'); 
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
-    
-    // randomlyPlaceShips(currentPlayer); //Needs to be called twice?
+    randomlyPlaceShips(currentPlayer); 
+    boardEl.style.pointerEvents = 'auto';
 }
 
-function createBoard(boardElement) { //add input for board element refernece to replace hard coded 'boardEL'
+function createBoard(boardElement) { 
     for (i=1; i<=BOARD_HEIGHT; i++) {
         for (i2=1; i2<=BOARD_WIDTH; i2++) {
             const divEl = document.createElement("div");
@@ -207,7 +181,7 @@ function handleBoardClick(evt) {
     }
 }
 
-function handleShowShips(){
+function ShowShips(){
 // end of game reveal of ships & cheat mode to display ship locations
 let shipToAdd = null;
 currentPlayer.shipLocations.forEach((ships, idx) => {
@@ -241,10 +215,6 @@ function showExplosion(imageURL, targetEl){
     targetEl.appendChild(showExplosion);
 }
 
-function shipSunk() {
-// TBD - display each ship sunk when completely sunk
-}
-
 //Render DOM and determine if shot was a hit
 function renderShot(boardCoordinate, targetSquare) {
     // let showExplosion = null;
@@ -268,12 +238,12 @@ function renderShot(boardCoordinate, targetSquare) {
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} WINS!!!!</strong>`;
         currentPlayer.recordWin();  
-        handleShowShips();
+        ShowShips();
         boardEl.style.pointerEvents = 'none';
     }
     if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} loses!  BOOOOO!!!</strong>`;
-        handleShowShips();
+        ShowShips();
         boardEl.style.pointerEvents = 'none';
     }
 }
