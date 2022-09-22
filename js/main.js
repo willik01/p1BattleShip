@@ -62,27 +62,32 @@ let currentPlayer = player1;
 
 /*----- cached element references -----*/
 //Board 1
-let shotsLeftEl = document.getElementById('sl1');
-let hitsEl = document.getElementById('hits1');
-let missesEl = document.getElementById('misses1');
-const messageDisplayEl1 = document.getElementById('messageDisplay1');
-const resetBtnEl1 = document.getElementById('resetBtn1');
-const boardEl1 = document.getElementById('board1');
-const showShipsBtnEl1 = document.getElementById('showShips1');
+let shotsLeftEl = document.getElementById('sl');
+let hitsEl = document.getElementById('hits');
+let missesEl = document.getElementById('misses');
+const messageDisplayEl = document.getElementById('messageDisplay');
+const resetBtnEl = document.getElementById('resetBtn');
+const boardEl = document.getElementById('board');
+const showShipsBtnEl = document.getElementById('showShips');
 
 //Board 2
-let shotsLeftEl = document.getElementById('sl2');
-let hitsEl = document.getElementById('hits2');
-let missesEl = document.getElementById('misses2');
-const messageDisplayEl1 = document.getElementById('messageDisplay2');
-const resetBtnEl1 = document.getElementById('resetBtn2');
-const boardEl1 = document.getElementById('board2');
-const showShipsBtnEl1 = document.getElementById('showShips2');
+let shotsLeftEl2 = document.getElementById('sl2');
+let hitsEl2 = document.getElementById('hits2');
+let missesEl2 = document.getElementById('misses2');
+const messageDisplayEl2 = document.getElementById('messageDisplay2');
+const resetBtnEl2 = document.getElementById('resetBtn2');
+const boardEl2 = document.getElementById('board2');
+const showShipsBtnEl2 = document.getElementById('showShips2');
 
 /*----- event listeners -----*/
+// board 1
 resetBtnEl.addEventListener('click', handleResetClick);
 boardEl.addEventListener('click', handleBoardClick);
 showShipsBtnEl.addEventListener('click', (handleShowShips));
+//board 2
+resetBtnEl2.addEventListener('click', handleResetClick);
+boardEl2.addEventListener('click', handleBoardClick);
+showShipsBtnEl2.addEventListener('click', (handleShowShips));
 /*----- functions -----*/
 
 //
@@ -94,30 +99,33 @@ randomlyPlaceShips(currentPlayer);
 //
 //
 //
-function initGame(){
+function initGame(){ //add player input for 1 player vs. 2 player - init as required 
     //first clear board
     if (boardEl.hasChildNodes()) {
         while (boardEl.hasChildNodes()) {
             boardEl.removeChild(boardEl.firstChild);
         }
     }
-    createBoard();
-    currentPlayer.reset();
+    createBoard(boardEl); //do once for each board, passing the boardEl and board El2
+    currentPlayer.reset(); //reset both player
+
+    //create function for these resets - need to do for both board in 2player
     messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
     //reset element references
-    shotsLeftEl = document.getElementById('sl');
+    shotsLeftEl = document.getElementById('sl'); 
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
-    randomlyPlaceShips(currentPlayer);
+    
+    // randomlyPlaceShips(currentPlayer); //Needs to be called twice?
 }
 
-function createBoard() {
+function createBoard(boardElement) { //add input for board element refernece to replace hard coded 'boardEL'
     for (i=1; i<=BOARD_HEIGHT; i++) {
         for (i2=1; i2<=BOARD_WIDTH; i2++) {
             const divEl = document.createElement("div");
             divEl.classList.add(`square`);
             divEl.id = `r${i}c${i2}`;
-            boardEl.appendChild(divEl);
+            boardElement.appendChild(divEl);
         }
     }
 }
@@ -201,11 +209,13 @@ function handleBoardClick(evt) {
 
 function handleShowShips(){
 // end of game reveal of ships & cheat mode to display ship locations
+let shipToAdd = null;
 currentPlayer.shipLocations.forEach((ships, idx) => {
-    document.getElementById(ships.location[0]).innerHTML = `<img src='assets/s_${ships.name}.png' alt='${ships.name}' width='${(SHIPS[idx].length * 36)}' height='auto'>)`
-//
-//    document.getElementById(ships.location[0]).style.backgroundImage = "url('assets/hit.png')";
-//
+    shipToAdd = document.createElement('img');
+    shipToAdd.src = `assets/s_${ships.name}.png`;
+    shipToAdd.width = `${(SHIPS[idx].length * 36)}`;
+    shipToAdd.classList.add('shipsImage');
+    document.getElementById(ships.location[0]).appendChild(shipToAdd);
         if ( currentPlayer.shipDirection[idx].direction === 1 ) {
             document.getElementById(ships.location[0]).style.transform = 'rotate(90deg)';
         }
@@ -222,22 +232,33 @@ function checkHit (boardCoordinate) {
     return foundShip;
 }
 
-function shipSunk() {
+function showExplosion(imageURL, targetEl){
+    let showExplosion = document.createElement('img');
+    showExplosion.src = imageURL;
+    showExplosion.style.width = '100%';
+    showExplosion.style.height = '100%';
+    showExplosion.classList.add('explosion');
+    targetEl.appendChild(showExplosion);
+}
 
+function shipSunk() {
+// TBD - display each ship sunk when completely sunk
 }
 
 //Render DOM and determine if shot was a hit
 function renderShot(boardCoordinate, targetSquare) {
+    // let showExplosion = null;
     if (checkHit(boardCoordinate)) {
-        targetSquare.style.backgroundImage = "url('assets/hit.png')";
+        showExplosion('assets/hit.png', targetSquare);
         targetSquare.style.pointerEvents = 'none';
         currentPlayer.recordHit(); 
+        // targetSquare.style.backgroundImage = "url('assets/hit.png')";
     } else {
-        targetSquare.style.backgroundImage = "url('assets/miss.png')";
+        showExplosion('assets/miss.png', targetSquare);
         targetSquare.style.pointerEvents = 'none';
         currentPlayer.recordMiss(); 
+        // targetSquare.style.backgroundImage = "url('assets/miss.png')";
     }
-    
     //update message bar
     shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
     hitsEl.innerText = currentPlayer.hits;
@@ -248,10 +269,12 @@ function renderShot(boardCoordinate, targetSquare) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} WINS!!!!</strong>`;
         currentPlayer.recordWin();  
         handleShowShips();
+        boardEl.style.pointerEvents = 'none';
     }
     if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>${currentPlayer.name} loses!  BOOOOO!!!</strong>`;
         handleShowShips();
+        boardEl.style.pointerEvents = 'none';
     }
 }
 
