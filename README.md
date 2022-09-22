@@ -3,7 +3,7 @@
 # Battleshippy
 Battleshippy is a play on the original Battleship game. Your goal is to find the enemy ships on the playing board by cliking where you believe the ships are located. If you miss, you'll see a splash of water. If you hit, you'll see an 'explosion'. Find and sink all 5 ships in 50 or fewer shots and you win. 
 
- ## Screenshot(s): Images of your actual game.
+ ## Game Screenshots: 
  <img src="assets/ScreenShot_StartOfGame.png" width="900">
 
  <img src="assets/ScreenShot_PlayerWins.png"

@@ -82,10 +82,9 @@ function initGame(){
         }
     }
     createBoard(boardEl);
-    currentPlayer.reset();
-
+    currentPlayer.reset(); 
     messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
-    //reset element references
+    //reset element references for board refresh
     shotsLeftEl = document.getElementById('sl'); 
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
@@ -181,7 +180,7 @@ function handleBoardClick(evt) {
     }
 }
 
-function ShowShips(){
+function showShips(){
 // end of game reveal of ships & cheat mode to display ship locations
 let shipToAdd = null;
 currentPlayer.shipLocations.forEach((ships, idx) => {
@@ -238,10 +237,12 @@ function renderShot(boardCoordinate, targetSquare) {
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordWin();  
+        showShips();
         boardEl.style.pointerEvents = 'none';
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
-        ShowShips();
+        currentPlayer.recordLoss();
+        showShips();
         boardEl.style.pointerEvents = 'none';
     }
 }
