@@ -239,8 +239,7 @@ function renderShot(boardCoordinate, targetSquare) {
         messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordWin();  
         boardEl.style.pointerEvents = 'none';
-    }
-    if ((currentPlayer.hits + currentPlayer.misses) > 50) {
+    }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         ShowShips();
         boardEl.style.pointerEvents = 'none';
