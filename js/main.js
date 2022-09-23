@@ -34,22 +34,46 @@ class  Player {
             {name: SHIPS[3].name, direction: null},
             {name: SHIPS[4].name, direction: null},
         ]
+        this.shipHits = [
+            {name: SHIPS[0].name, numHits: null},
+            {name: SHIPS[1].name, numHits: null},
+            {name: SHIPS[2].name, numHits: null},
+            {name: SHIPS[3].name, numHits: null},
+            {name: SHIPS[4].name, numHits: null},
+        ]
     }
     recordHit() {
         this.hits +=1;
     }
+
     recordMiss() {
         this.misses +=1;
     }
+
+    recordShipHit(shipIdx) {
+        this.shipHits[shipIdx].numHits +=1;
+    }
+    
+    isShipSunk(shipIdx){
+        if (SHIPS[shipIdx].length === this.shipHits[shipIdx].numHits) {
+            return true;
+        }
+    }
+    
     recordWin() {
         this.wins +=1;
     }
+    
     recordLoss() {
         this.losses +=1;
     }
+    
     reset() {
         this.hits = 0;
         this.misses = 0;
+        this.shipHits.forEach(element => {
+            element.numHits = null;
+        });
     }
 }
 
@@ -131,13 +155,13 @@ function randomlyPlaceShips(player) {
             if (directionOfShip) {
                 tempShipLocationArr.push(`r${startPositionX + locationIdx}c${startPositionY}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkHit(`r${startPositionX + locationIdx}c${startPositionY}`)){
+                if (checkOverlappingShips(`r${startPositionX + locationIdx}c${startPositionY}`)){
                     doNotIncrement = true;
                 }
             } else {
                 tempShipLocationArr.push(`r${startPositionX}c${startPositionY + locationIdx}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkHit(`r${startPositionX}c${startPositionY + locationIdx}`)){
+                if (checkOverlappingShips(`r${startPositionX}c${startPositionY + locationIdx}`)){
                     doNotIncrement = true;
                 }
             }    
@@ -184,18 +208,45 @@ function showShips(){
 // end of game reveal of ships & cheat mode to display ship locations
 let shipToAdd = null;
 currentPlayer.shipLocations.forEach((ships, idx) => {
-    shipToAdd = document.createElement('img');
-    shipToAdd.src = `assets/s_${ships.name}.png`;
-    shipToAdd.width = `${(SHIPS[idx].length * 36)}`;
-    shipToAdd.classList.add('shipsImage');
-    document.getElementById(ships.location[0]).appendChild(shipToAdd);
-        if ( currentPlayer.shipDirection[idx].direction === 1 ) {
-            document.getElementById(ships.location[0]).style.transform = 'rotate(90deg)';
-        }
+    placeShip (ships.location[0], idx)
     });
 }
+
 //check to see if clicked square is in the player's ship list
 function checkHit (boardCoordinate) {
+    let foundShip = false;
+    let shipToAdd = null;  ///should move to ship add function////
+    currentPlayer.shipLocations.forEach((shipObj, idx) => {
+        if(shipObj.location.includes(boardCoordinate)) {
+            foundShip = true;
+            currentPlayer.recordShipHit(idx);
+            if (currentPlayer.isShipSunk(idx)) {
+                placeShip (currentPlayer.shipLocations[idx].location[0], idx)
+            }
+        } 
+    });
+    return foundShip;
+}
+
+function placeShip (boardLocation, shipLocationsIdx) {
+    // console.log('image node? ', document.getElementById(boardLocation).firstChild.classList.contains('explosion'))           
+    shipToAdd = document.createElement('img');
+    shipToAdd.src = `assets/s_${SHIPS[shipLocationsIdx].name}.png`;
+    shipToAdd.width = `${(SHIPS[shipLocationsIdx].length * 36)}`;
+    shipToAdd.classList.add('shipsImage');   
+    
+    //check if there is a ship already there (for end of game ship display).
+    const boardSquareEl = document.getElementById(boardLocation);
+    if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+        boardSquareEl.appendChild(shipToAdd);
+        if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+            boardSquareEl.style.transform = 'rotate(90deg)';
+        }
+    }
+}
+
+//check to see if randomly chosen ship location conflicts with other placed ships
+function checkOverlappingShips (boardCoordinate) {
     let foundShip = false;
     currentPlayer.shipLocations.forEach((shipObj) => {
         if(shipObj.location.includes(boardCoordinate)) {
@@ -215,18 +266,17 @@ function showExplosion(imageURL, targetEl){
 }
 
 //Render DOM and determine if shot was a hit
-function renderShot(boardCoordinate, targetSquare) {
+function renderShot(boardCoordinate, targetSquareEl) {
     // let showExplosion = null;
     if (checkHit(boardCoordinate)) {
-        showExplosion('assets/hit.png', targetSquare);
-        targetSquare.style.pointerEvents = 'none';
+        showExplosion('assets/hit.png', targetSquareEl);
+        //show ship if it is sunk
+        targetSquareEl.style.pointerEvents = 'none';
         currentPlayer.recordHit(); 
-        // targetSquare.style.backgroundImage = "url('assets/hit.png')";
     } else {
-        showExplosion('assets/miss.png', targetSquare);
-        targetSquare.style.pointerEvents = 'none';
+        showExplosion('assets/miss.png', targetSquareEl);
+        targetSquareEl.style.pointerEvents = 'none';
         currentPlayer.recordMiss(); 
-        // targetSquare.style.backgroundImage = "url('assets/miss.png')";
     }
     //update message bar
     shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
@@ -237,7 +287,7 @@ function renderShot(boardCoordinate, targetSquare) {
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordWin();  
-        showShips();
+        // showShips();
         boardEl.style.pointerEvents = 'none';
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
