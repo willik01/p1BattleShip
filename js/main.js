@@ -90,11 +90,17 @@ let hitsEl = document.getElementById('hits');
 let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
 const resetBtnEl = document.getElementById('resetBtn');
+const numPlayerBtnEl = document.getElementById('numPlayer');
 const boardEl = document.getElementById('board');
+const boardTwoEl = document.getElementById('board2')
+const twoPlayerBoardEL = document.getElementById('twoPlayerBoard') //Needed?
+const boardTwoContainerEl = document.querySelector('.boardTwoContainer')
+
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
 boardEl.addEventListener('click', handleBoardClick);
+numPlayerBtnEl.addEventListener('click', handleNumPlayerClick);
 
 /*----- functions -----*/
 
@@ -114,6 +120,30 @@ function initGame(){
     missesEl = document.getElementById('misses');
     randomlyPlaceShips(currentPlayer); 
     boardEl.style.pointerEvents = 'auto';
+}
+// Switch between one & two player board
+function handleNumPlayerClick(){
+    numPlayerBtnEl.innerText = (numPlayerBtnEl.innerText === "Change to two player game")? 
+    setOnePlayerBoard():setTwoPlayerBoard(); 
+    // if (numPlayerBtnEl.innerText === "Change to two player game") {
+    //     numPlayerBtnEl.innerText = "Change to one player game"
+    //     setTwoPlayerBoard();
+    // } else {
+    //     numPlayerBtnEl.innerText = "Change to two player game"
+    //     setOnePlayerBoard();
+    // }
+}
+
+function setOnePlayerBoard(){
+    console.log('setting TWO player board') //actions need to happen before returning text
+    boardTwoContainerEl.style.display = 'inline';
+    createBoard(boardTwoEl);
+    return "Change to one player game"
+}
+function setTwoPlayerBoard(){
+    console.log('setting ONE player board') //actions need to happen before returning text
+    boardTwoContainerEl.style.display = 'none';
+    return "Change to two player game"
 }
 
 function createBoard(boardElement) { 
