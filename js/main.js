@@ -60,11 +60,11 @@ class  Player {
         }
     }
     
-    recordWin() {
-        this.wins +=1;
+    recordWin() {  //Display this
+        this.wins +=1; 
     }
     
-    recordLoss() {
+    recordLoss() { //Display this
         this.losses +=1;
     }
     
@@ -82,49 +82,64 @@ class  Player {
 let player1 = new Player ("Keith", NUM_SHOTS);
 let player2 = new Player ("Zev", NUM_SHOTS);
 let currentPlayer = player1;
+let playingTwoPlayerGame = false;
 
 /*----- cached element references -----*/
+const resetBtnEl = document.getElementById('resetBtn');
+const numPlayerBtnEl = document.getElementById('numPlayer');
+
 //Board 1
 let shotsLeftEl = document.getElementById('sl');
 let hitsEl = document.getElementById('hits');
 let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
-const resetBtnEl = document.getElementById('resetBtn');
-const numPlayerBtnEl = document.getElementById('numPlayer');
-const boardEl = document.getElementById('board');
-const boardTwoEl = document.getElementById('board2')
-const twoPlayerBoardEL = document.getElementById('twoPlayerBoard') //Needed?
+const boardEl = document.getElementById('board'); 
+
+//Board 2
+let shotsLeftEl2 = document.getElementById('sl2');
+let hitsEl2 = document.getElementById('hits2');
+let missesEl2 = document.getElementById('misses2');
+const messageDisplayEl2 = document.getElementById('messageDisplay2');
+const boardTwoEl = document.getElementById('board2') 
 const boardTwoContainerEl = document.querySelector('.boardTwoContainer')
 
+const twoPlayerBoardEL = document.querySelector('.flexContainer') //Needed?
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
-boardEl.addEventListener('click', handleBoardClick);
+// boardEl.addEventListener('click', handleBoardClick);  //Not needed because eventListner set at parent of both boards
 numPlayerBtnEl.addEventListener('click', handleNumPlayerClick);
-
+twoPlayerBoardEL.addEventListener('click', handleBoardClick);
 /*----- functions -----*/
 
 function initGame(){ 
-    //first clear board
-    if (boardEl.hasChildNodes()) {
-        while (boardEl.hasChildNodes()) {
-            boardEl.removeChild(boardEl.firstChild);
-        }
-    }
+    // clear boards, create boards, place
+    clearBoard(boardEl);
+    clearBoard(boardTwoEl);
     createBoard(boardEl);
-    currentPlayer.reset(); 
-    messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
+    createBoard(boardTwoEl);
+    randomlyPlaceShips(player1); 
+    randomlyPlaceShips(player2); ///THIS NEEDS TO BE DYNAMIC
+    player1.reset(); ///THIS NEEDS TO BE DYNAMIC
+    player2.reset();///THIS NEEDS TO BE DYNAMIC
+    messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
+    messageDisplayEl2.innerHTML = `${player2.name} Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span>`
+    
     //reset element references for board refresh
     shotsLeftEl = document.getElementById('sl'); 
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
-    randomlyPlaceShips(currentPlayer); 
+    shotsLeftEl2 = document.getElementById('sl2'); 
+    hitsEl2 = document.getElementById('hits2');
+    missesEl2 = document.getElementById('misses2');
     boardEl.style.pointerEvents = 'auto';
 }
+
 // Switch between one & two player board
 function handleNumPlayerClick(){
     numPlayerBtnEl.innerText = (numPlayerBtnEl.innerText === "Change to two player game")? 
-    setOnePlayerBoard():setTwoPlayerBoard(); 
+    setTwoPlayerBoard():setOnePlayerBoard(); 
+    initGame();
     // if (numPlayerBtnEl.innerText === "Change to two player game") {
     //     numPlayerBtnEl.innerText = "Change to one player game"
     //     setTwoPlayerBoard();
@@ -134,16 +149,24 @@ function handleNumPlayerClick(){
     // }
 }
 
-function setOnePlayerBoard(){
+function setTwoPlayerBoard(){
     console.log('setting TWO player board') //actions need to happen before returning text
     boardTwoContainerEl.style.display = 'inline';
-    createBoard(boardTwoEl);
+    playingTwoPlayerGame = true;
     return "Change to one player game"
 }
-function setTwoPlayerBoard(){
+function setOnePlayerBoard(){
     console.log('setting ONE player board') //actions need to happen before returning text
     boardTwoContainerEl.style.display = 'none';
+    playingTwoPlayerGame = true;
     return "Change to two player game"
+}
+function clearBoard(boardNameEl) {
+    if (boardNameEl.hasChildNodes()) {
+        while (boardNameEl.hasChildNodes()) {
+            boardNameEl.removeChild(boardNameEl.firstChild);
+        }
+    }
 }
 
 function createBoard(boardElement) { 
@@ -231,7 +254,16 @@ function handleBoardClick(evt) {
     if (evt.target.id !== 'board') {
         //Check for hit
         renderShot(evt.target.id, evt.target);
+        if (playingTwoPlayerGame === true) {
+            changePlayer();
+        }
     }
+}
+
+function changePlayer() {
+    currentPlayer = (currentPlayer === player1)? 
+    player2:player1; 
+    console.log('changeing to:', currentPlayer) 
 }
 
 function showShips(){
