@@ -3,6 +3,10 @@ body {
     background-image: url("../assets/navyBattleGroup.png");
 }
 
+.boardTwoContainer {
+  display: none;
+}
+
 .board {
     display: flex;
     height: 370px;
@@ -13,6 +17,7 @@ body {
     flex-wrap: wrap;
     background-image: url("../assets/waterBig.png");
     background-size: 100%;
+    /* z-index: 0; */
 }
 
 .square{
@@ -26,13 +31,13 @@ body {
     z-index: 0;
     position: relative; 
 }
-.flexParent {
+.flexContainer {
     display: flex;
     justify-content: space-evenly;
 }
 /* mouse over link */
 .square:hover {
-    background-color: red;
+    background-image: url("../assets/crosshairs.png");
   }
 
 #message-box{
@@ -42,6 +47,7 @@ body {
 button {
     margin: 0 auto;
 }
+
 /* pointer-events avoids 'board' click on the image vs. the square */
 img {
     pointer-events: none;

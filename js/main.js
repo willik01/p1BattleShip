@@ -60,11 +60,11 @@ class  Player {
         }
     }
     
-    recordWin() {
-        this.wins +=1;
+    recordWin() {  //Display this
+        this.wins +=1; 
     }
     
-    recordLoss() {
+    recordLoss() { //Display this
         this.losses +=1;
     }
     
@@ -82,52 +82,109 @@ class  Player {
 let player1 = new Player ("Keith", NUM_SHOTS);
 let player2 = new Player ("Zev", NUM_SHOTS);
 let currentPlayer = player1;
+let playingTwoPlayerGame = false;
 
 /*----- cached element references -----*/
+const resetBtnEl = document.getElementById('resetBtn');
+const numPlayerBtnEl = document.getElementById('numPlayer');
+
 //Board 1
 let shotsLeftEl = document.getElementById('sl');
 let hitsEl = document.getElementById('hits');
 let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
-const resetBtnEl = document.getElementById('resetBtn');
-const boardEl = document.getElementById('board');
+const boardEl = document.getElementById('board'); 
+
+//Board 2
+let shotsLeftEl2 = document.getElementById('sl2');
+let hitsEl2 = document.getElementById('hits2');
+let missesEl2 = document.getElementById('misses2');
+const messageDisplayEl2 = document.getElementById('messageDisplay2');
+const boardTwoEl = document.getElementById('board2') 
+const boardTwoContainerEl = document.querySelector('.boardTwoContainer')
+
+const twoPlayerBoardEL = document.querySelector('.flexContainer') //Needed?
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
-boardEl.addEventListener('click', handleBoardClick);
-
+// boardEl.addEventListener('click', handleBoardClick);  //Not needed because eventListner set at parent of both boards
+numPlayerBtnEl.addEventListener('click', handleNumPlayerClick);
+twoPlayerBoardEL.addEventListener('click', handleBoardClick);
 /*----- functions -----*/
 
 function initGame(){ 
-    //first clear board
-    if (boardEl.hasChildNodes()) {
-        while (boardEl.hasChildNodes()) {
-            boardEl.removeChild(boardEl.firstChild);
-        }
-    }
+    // clear boards, create boards, place
+    clearBoard(boardEl);
+    clearBoard(boardTwoEl);
     createBoard(boardEl);
-    currentPlayer.reset(); 
-    messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
+    createBoard(boardTwoEl);
+    randomlyPlaceShips(player1, "b1"); 
+    randomlyPlaceShips(player2, "b2"); ///THIS NEEDS TO BE DYNAMIC
+    player1.reset(); ///THIS NEEDS TO BE DYNAMIC
+    player2.reset();///THIS NEEDS TO BE DYNAMIC
+    messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
+    messageDisplayEl2.innerHTML = `${player2.name} Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span>`
+    
     //reset element references for board refresh
     shotsLeftEl = document.getElementById('sl'); 
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
-    randomlyPlaceShips(currentPlayer); 
+    shotsLeftEl2 = document.getElementById('sl2'); 
+    hitsEl2 = document.getElementById('hits2');
+    missesEl2 = document.getElementById('misses2');
     boardEl.style.pointerEvents = 'auto';
 }
 
-function createBoard(boardElement) { 
+// Switch between one & two player board
+function handleNumPlayerClick(){
+    numPlayerBtnEl.innerText = (numPlayerBtnEl.innerText === "Change to two player game")? 
+    setTwoPlayerBoard():setOnePlayerBoard(); 
+    initGame();
+    // if (numPlayerBtnEl.innerText === "Change to two player game") {
+    //     numPlayerBtnEl.innerText = "Change to one player game"
+    //     setTwoPlayerBoard();
+    // } else {
+    //     numPlayerBtnEl.innerText = "Change to two player game"
+    //     setOnePlayerBoard();
+    // }
+}
+
+function setTwoPlayerBoard(){
+    console.log('setting TWO player board') //actions need to happen before returning text
+    boardTwoContainerEl.style.display = 'inline';
+    playingTwoPlayerGame = true;
+    return "Change to one player game"
+}
+function setOnePlayerBoard(){
+    console.log('setting ONE player board') //actions need to happen before returning text
+    boardTwoContainerEl.style.display = 'none';
+    playingTwoPlayerGame = true;
+    return "Change to two player game"
+}
+function clearBoard(boardNameEl) { //this should use the same input parameter as create board
+    if (boardNameEl.hasChildNodes()) {
+        while (boardNameEl.hasChildNodes()) {
+            boardNameEl.removeChild(boardNameEl.firstChild);
+        }
+    }
+}
+
+function createBoard(boardElement) { //this should use the same input parameter as clear board
     for (i=1; i<=BOARD_HEIGHT; i++) {
         for (i2=1; i2<=BOARD_WIDTH; i2++) {
             const divEl = document.createElement("div");
             divEl.classList.add(`square`);
-            divEl.id = `r${i}c${i2}`;
+            if (boardElement === boardEl) {
+                divEl.id = `b1r${i}c${i2}`;
+            } else {
+                divEl.id = `b1r${i}c${i2}`;
+            }
             boardElement.appendChild(divEl);
         }
     }
 }
 
-function randomlyPlaceShips(player) {
+function randomlyPlaceShips(player, playerBoard) {
     let shipIdx = 0;  
     let doNotIncrement = null;
     let startPositionX = null;
@@ -147,21 +204,21 @@ function randomlyPlaceShips(player) {
             startPositionX = getShipStartPositionX(BOARD_WIDTH);
             startPositionY = getShipStartPositionY(BOARD_HEIGHT - SHIPS[shipIdx].length);
         }
-
+        
         // record the new location based on a random start point and direction (down or right)
         //loop through length of ship to record locations for whole ship and build temp location array
         tempShipLocationArr.length = 0;
         for (let locationIdx=0; locationIdx<SHIPS[shipIdx].length; locationIdx++) {
             if (directionOfShip) {
-                tempShipLocationArr.push(`r${startPositionX + locationIdx}c${startPositionY}`)
+                tempShipLocationArr.push(`${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkOverlappingShips(`r${startPositionX + locationIdx}c${startPositionY}`)){
+                if (checkOverlappingShips(`${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)){
                     doNotIncrement = true;
                 }
             } else {
-                tempShipLocationArr.push(`r${startPositionX}c${startPositionY + locationIdx}`)
+                tempShipLocationArr.push(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkOverlappingShips(`r${startPositionX}c${startPositionY + locationIdx}`)){
+                if (checkOverlappingShips(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)){
                     doNotIncrement = true;
                 }
             }    
@@ -170,11 +227,21 @@ function randomlyPlaceShips(player) {
         if (!doNotIncrement) {
             player.shipLocations[shipIdx].location.length = 0;
             tempShipLocationArr.forEach(coordinate => {
-               player.shipLocations[shipIdx].location.push(coordinate);
+                player.shipLocations[shipIdx].location.push(coordinate);
             });
             shipIdx++;
         }
     };
+}
+//check to see if randomly chosen ship location conflicts with other placed ships
+function checkOverlappingShips (boardCoordinate) {
+    let foundShip = false;
+    currentPlayer.shipLocations.forEach((shipObj) => {
+        if(shipObj.location.includes(boardCoordinate)) {
+            foundShip = true;
+        } 
+    });
+    return foundShip;
 }
 
 function getShipStartPositionX(boardWidth) {
@@ -201,7 +268,16 @@ function handleBoardClick(evt) {
     if (evt.target.id !== 'board') {
         //Check for hit
         renderShot(evt.target.id, evt.target);
+        if (playingTwoPlayerGame === true) {
+            changePlayer();
+        }
     }
+}
+
+function changePlayer() {
+    currentPlayer = (currentPlayer === player1)? 
+    player2:player1; 
+    console.log('changeing to:', currentPlayer) // REMOVE
 }
 
 function showShips(){
@@ -236,25 +312,32 @@ function placeShip (boardLocation, shipLocationsIdx) {
     shipToAdd.classList.add('shipsImage');   
     
     //check if there is a ship already there (for end of game ship display).
-    const boardSquareEl = document.getElementById(boardLocation);
-    if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
-        boardSquareEl.appendChild(shipToAdd);
-        if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
-            boardSquareEl.style.transform = 'rotate(90deg)';
+
+//NEED TO FIGURE OUT HOW TO HIT P2's BOARD
+//NEED TO FIGURE OUT HOW TO HIT P2's BOARD
+//NEED TO FIGURE OUT HOW TO HIT P2's BOARD:
+    const boardSquareEl = document.getElementById(boardLocation); 
+    //
+    //
+    //
+    // There has to be a cleaner way to do this:
+    if (currentPlayer === player1) {
+        if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+            boardSquareEl.appendChild(shipToAdd);
+            if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+                boardSquareEl.style.transform = 'rotate(90deg)';
+            }
+        }
+    } else {
+        if (boardSquareEl2.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+            boardSquareEl2.appendChild(shipToAdd);
+            if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+                boardSquareEl2.style.transform = 'rotate(90deg)';
+            }
         }
     }
 }
 
-//check to see if randomly chosen ship location conflicts with other placed ships
-function checkOverlappingShips (boardCoordinate) {
-    let foundShip = false;
-    currentPlayer.shipLocations.forEach((shipObj) => {
-        if(shipObj.location.includes(boardCoordinate)) {
-            foundShip = true;
-        } 
-    });
-    return foundShip;
-}
 
 function showExplosion(imageURL, targetEl){
     let showExplosion = document.createElement('img');
@@ -278,10 +361,20 @@ function renderShot(boardCoordinate, targetSquareEl) {
         targetSquareEl.style.pointerEvents = 'none';
         currentPlayer.recordMiss(); 
     }
-    //update message bar
-    shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
-    hitsEl.innerText = currentPlayer.hits;
-    missesEl.innerText = currentPlayer.misses;
+    //update message bar 
+    //
+    //
+    //
+    // There has to be a cleaner way to do this
+    if (currentPlayer === player1) {
+        shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+        hitsEl.innerText = currentPlayer.hits;
+        missesEl.innerText = currentPlayer.misses;
+    } else {
+        shotsLeftEl2.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+        hitsEl2.innerText = currentPlayer.hits;
+        missesEl2.innerText = currentPlayer.misses;
+    }
     
     //determine if there is a win or loss
     if (currentPlayer.hits === 17) {
