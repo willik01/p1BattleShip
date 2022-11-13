@@ -94,6 +94,7 @@ let hitsEl = document.getElementById('hits');
 let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
 const boardEl = document.getElementById('board'); 
+const boardOneContainerEl = document.querySelector('.boardOneContainer');
 
 //Board 2
 let shotsLeftEl2 = document.getElementById('sl2');
@@ -151,7 +152,8 @@ function handleNumPlayerClick(){
 
 function setTwoPlayerBoard(){
     console.log('setting TWO player board') //actions need to happen before returning text
-    boardTwoContainerEl.style.display = 'inline';
+    boardTwoContainerEl.style.display = 'inline'; 
+    boardTwoContainerEl.style.pointerEvents = 'none';
     playingTwoPlayerGame = true;
     return "Change to one player game"
 }
@@ -273,10 +275,21 @@ function handleBoardClick(evt) {
         }
     }
 }
-
+/// hightlight play borad and disable non-play board. 
 function changePlayer() {
+    // boardEl.style.pointerEvents = 'none';  -----This needs to be playerBoardEl kgw
     currentPlayer = (currentPlayer === player1)? 
     player2:player1; 
+
+    if (currentPlayer === player1) {
+        boardTwoContainerEl.style.pointerEvents = 'none';
+        boardOneContainerEl.style.pointerEvents = 'auto';
+    } else {
+        boardTwoContainerEl.style.pointerEvents = 'auto';
+        boardOneContainerEl.style.pointerEvents = 'none';
+
+    }
+
     console.log('changeing to:', currentPlayer) // REMOVE
 }
 
