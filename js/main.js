@@ -123,6 +123,8 @@ function initGame(){
     randomlyPlaceShips(player2, "b2"); ///THIS NEEDS TO BE DYNAMIC
     player1.reset(); ///THIS NEEDS TO BE DYNAMIC
     player2.reset();///THIS NEEDS TO BE DYNAMIC
+    boardTwoContainerEl.style.pointerEvents = 'none';
+    boardOneContainerEl.style.pointerEvents = 'auto';
     messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
     messageDisplayEl2.innerHTML = `${player2.name} Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span>`
     
@@ -133,7 +135,7 @@ function initGame(){
     shotsLeftEl2 = document.getElementById('sl2'); 
     hitsEl2 = document.getElementById('hits2');
     missesEl2 = document.getElementById('misses2');
-    boardEl.style.pointerEvents = 'auto';
+    // boardEl.style.pointerEvents = 'auto';
 }
 
 // Switch between one & two player board
@@ -176,6 +178,7 @@ function createBoard(boardElement) { //this should use the same input parameter 
         for (i2=1; i2<=BOARD_WIDTH; i2++) {
             const divEl = document.createElement("div");
             divEl.classList.add(`square`);
+            divEl.classList.add(`delete`);
             if (boardElement === boardEl) {
                 divEl.id = `b1r${i}c${i2}`;
             } else {
@@ -264,10 +267,10 @@ function handleResetClick() {
 }
 
 function handleBoardClick(evt) {
-    //  console.log('evt.target: ', evt.target);
+    //  console.log('evt.target: ', evt.target, 'evt.target.id: ', evt.target.id, 'evt.target.className: ', evt.target.className);
     // if (!winner) {return};
 
-    if (evt.target.id !== 'board') {
+    if (evt.target.className.indexOf('square') > -1) {
         //Check for hit
         renderShot(evt.target.id, evt.target);
         if (playingTwoPlayerGame === true) {
@@ -287,9 +290,7 @@ function changePlayer() {
     } else {
         boardTwoContainerEl.style.pointerEvents = 'auto';
         boardOneContainerEl.style.pointerEvents = 'none';
-
     }
-
     console.log('changeing to:', currentPlayer) // REMOVE
 }
 
