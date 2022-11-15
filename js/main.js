@@ -117,8 +117,8 @@ function initGame(){
     // clear boards, create boards, place
     clearBoard(boardEl);
     clearBoard(boardTwoEl);
-    createBoard(boardEl);
-    createBoard(boardTwoEl);
+    createBoard(boardEl, 1);
+    createBoard(boardTwoEl, 2);
     randomlyPlaceShips(player1, "b1"); 
     randomlyPlaceShips(player2, "b2"); ///THIS NEEDS TO BE DYNAMIC
     player1.reset(); ///THIS NEEDS TO BE DYNAMIC
@@ -173,16 +173,16 @@ function clearBoard(boardNameEl) { //this should use the same input parameter as
     }
 }
 
-function createBoard(boardElement) { //this should use the same input parameter as clear board
+function createBoard(boardElement, boardNumber) { //this should use the same input parameter as clear board
     for (i=1; i<=BOARD_HEIGHT; i++) {
         for (i2=1; i2<=BOARD_WIDTH; i2++) {
             const divEl = document.createElement("div");
             divEl.classList.add(`square`);
             divEl.classList.add(`delete`);
             if (boardElement === boardEl) {
-                divEl.id = `b1r${i}c${i2}`;
+                divEl.id = `b${boardNumber}r${i}c${i2}`;
             } else {
-                divEl.id = `b1r${i}c${i2}`;
+                divEl.id = `b${boardNumber}r${i}c${i2}`;
             }
             boardElement.appendChild(divEl);
         }
@@ -267,12 +267,11 @@ function handleResetClick() {
 }
 
 function handleBoardClick(evt) {
-    //  console.log('evt.target: ', evt.target, 'evt.target.id: ', evt.target.id, 'evt.target.className: ', evt.target.className);
-    // if (!winner) {return};
-
+//handle clicks on the playing board
     if (evt.target.className.indexOf('square') > -1) {
         //Check for hit
         renderShot(evt.target.id, evt.target);
+        console.log(evt.target.id, evt.target)
         if (playingTwoPlayerGame === true) {
             changePlayer();
         }
@@ -326,14 +325,7 @@ function placeShip (boardLocation, shipLocationsIdx) {
     shipToAdd.classList.add('shipsImage');   
     
     //check if there is a ship already there (for end of game ship display).
-
-//NEED TO FIGURE OUT HOW TO HIT P2's BOARD
-//NEED TO FIGURE OUT HOW TO HIT P2's BOARD
-//NEED TO FIGURE OUT HOW TO HIT P2's BOARD:
     const boardSquareEl = document.getElementById(boardLocation); 
-    //
-    //
-    //
     // There has to be a cleaner way to do this:
     if (currentPlayer === player1) {
         if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
@@ -343,10 +335,10 @@ function placeShip (boardLocation, shipLocationsIdx) {
             }
         }
     } else {
-        if (boardSquareEl2.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
-            boardSquareEl2.appendChild(shipToAdd);
+        if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+            boardSquareEl.appendChild(shipToAdd);
             if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
-                boardSquareEl2.style.transform = 'rotate(90deg)';
+                boardSquareEl.style.transform = 'rotate(90deg)';
             }
         }
     }
