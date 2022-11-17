@@ -217,13 +217,13 @@ function randomlyPlaceShips(player, playerBoard) {
             if (directionOfShip) {
                 tempShipLocationArr.push(`${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkOverlappingShips(`${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)){
+                if (checkOverlappingShips(player, `${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)){
                     doNotIncrement = true;
                 }
             } else {
                 tempShipLocationArr.push(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkOverlappingShips(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)){
+                if (checkOverlappingShips(player, `${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)){
                     doNotIncrement = true;
                 }
             }    
@@ -239,9 +239,9 @@ function randomlyPlaceShips(player, playerBoard) {
     };
 }
 //check to see if randomly chosen ship location conflicts with other placed ships
-function checkOverlappingShips (boardCoordinate) {
+function checkOverlappingShips (player, boardCoordinate) {
     let foundShip = false;
-    currentPlayer.shipLocations.forEach((shipObj) => {
+    player.shipLocations.forEach((shipObj) => {
         if(shipObj.location.includes(boardCoordinate)) {
             foundShip = true;
         } 
@@ -293,10 +293,10 @@ function changePlayer() {
     console.log('changeing to:', currentPlayer) // REMOVE
 }
 
-function showShips(){
+function showShips(player){
 // end of game reveal of ships & cheat mode to display ship locations
-let shipToAdd = null;
-currentPlayer.shipLocations.forEach((ships, idx) => {
+// let shipToAdd = null;  //REMOVE: I think this is errant and should be removed. Commented out nov 16
+player.shipLocations.forEach((ships, idx) => {
     placeShip (ships.location[0], idx)
     });
 }
@@ -318,7 +318,6 @@ function checkHit (boardCoordinate) {
 }
 
 function placeShip (boardLocation, shipLocationsIdx) {
-    // console.log('image node? ', document.getElementById(boardLocation).firstChild.classList.contains('explosion'))           
     shipToAdd = document.createElement('img');
     shipToAdd.src = `assets/s_${SHIPS[shipLocationsIdx].name}.png`;
     shipToAdd.width = `${(SHIPS[shipLocationsIdx].length * 36)}`;
@@ -326,22 +325,23 @@ function placeShip (boardLocation, shipLocationsIdx) {
     
     //check if there is a ship already there (for end of game ship display).
     const boardSquareEl = document.getElementById(boardLocation); 
-    // There has to be a cleaner way to do this:
-    if (currentPlayer === player1) {
+    // Does this outer if need to exist? Both sides are exactly the same. 
+    // if (currentPlayer === player1) {
         if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
             boardSquareEl.appendChild(shipToAdd);
             if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
                 boardSquareEl.style.transform = 'rotate(90deg)';
             }
         }
-    } else {
-        if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
-            boardSquareEl.appendChild(shipToAdd);
-            if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
-                boardSquareEl.style.transform = 'rotate(90deg)';
-            }
-        }
-    }
+    // } 
+    // else {
+    //     if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+    //         boardSquareEl.appendChild(shipToAdd);
+    //         if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+    //             boardSquareEl.style.transform = 'rotate(90deg)';
+    //         }
+    //     }
+    // }
 }
 
 
@@ -386,12 +386,15 @@ function renderShot(boardCoordinate, targetSquareEl) {
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordWin();  
-        // showShips();
+        //show opponents ships. Winner's ships already displayed. 
+        showShips((currentPlayer === player1) ? player2:player1);
         boardEl.style.pointerEvents = 'none';
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
+        //FIXXXXX: Player1 will always lose before player2 playes their 50th shot...
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         currentPlayer.recordLoss();
-        showShips();
+        showShips(player1);
+        showShips(player2);
         boardEl.style.pointerEvents = 'none';
     }
 }
