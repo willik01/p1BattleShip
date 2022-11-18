@@ -79,14 +79,15 @@ class  Player {
 
 /*----- app's state (variables) -----*/
 //Instantiate payers
-let player1 = new Player ("Keith", NUM_SHOTS);
-let player2 = new Player ("Zev", NUM_SHOTS);
+let player1 = new Player ("Player One", NUM_SHOTS);
+let player2 = new Player ("Player Two", NUM_SHOTS);
 let currentPlayer = player1;
 let playingTwoPlayerGame = false;
 
 /*----- cached element references -----*/
 const resetBtnEl = document.getElementById('resetBtn');
 const numPlayerBtnEl = document.getElementById('numPlayer');
+const playerTurnNotifyEl = document.getElementById('playersTurn')
 
 //Board 1
 let shotsLeftEl = document.getElementById('sl');
@@ -120,13 +121,14 @@ function initGame(){
     createBoard(boardEl, 1);
     createBoard(boardTwoEl, 2);
     randomlyPlaceShips(player1, "b1"); 
-    randomlyPlaceShips(player2, "b2"); ///THIS NEEDS TO BE DYNAMIC
-    player1.reset(); ///THIS NEEDS TO BE DYNAMIC
-    player2.reset();///THIS NEEDS TO BE DYNAMIC
-    boardTwoContainerEl.style.pointerEvents = 'none';
+    randomlyPlaceShips(player2, "b2"); 
+    player1.reset(); 
+    player2.reset();
     boardOneContainerEl.style.pointerEvents = 'auto';
+    boardTwoContainerEl.style.pointerEvents = 'none';
     messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
     messageDisplayEl2.innerHTML = `${player2.name} Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span>`
+    playerTurnNotifyEl.innerHTML = ``
     
     //reset element references for board refresh
     shotsLeftEl = document.getElementById('sl'); 
@@ -143,13 +145,6 @@ function handleNumPlayerClick(){
     numPlayerBtnEl.innerText = (numPlayerBtnEl.innerText === "Change to two player game")? 
     setTwoPlayerBoard():setOnePlayerBoard(); 
     initGame();
-    // if (numPlayerBtnEl.innerText === "Change to two player game") {
-    //     numPlayerBtnEl.innerText = "Change to one player game"
-    //     setTwoPlayerBoard();
-    // } else {
-    //     numPlayerBtnEl.innerText = "Change to two player game"
-    //     setOnePlayerBoard();
-    // }
 }
 
 function setTwoPlayerBoard(){
@@ -279,18 +274,18 @@ function handleBoardClick(evt) {
 }
 /// hightlight play borad and disable non-play board. 
 function changePlayer() {
-    // boardEl.style.pointerEvents = 'none';  -----This needs to be playerBoardEl kgw
     currentPlayer = (currentPlayer === player1)? 
     player2:player1; 
 
     if (currentPlayer === player1) {
         boardTwoContainerEl.style.pointerEvents = 'none';
         boardOneContainerEl.style.pointerEvents = 'auto';
+    
     } else {
         boardTwoContainerEl.style.pointerEvents = 'auto';
         boardOneContainerEl.style.pointerEvents = 'none';
     }
-    console.log('changeing to:', currentPlayer) // REMOVE
+    playerTurnNotifyEl.innerHTML = `It is now ${currentPlayer.name}'s Turn`
 }
 
 function showShips(player){
@@ -304,7 +299,6 @@ player.shipLocations.forEach((ships, idx) => {
 //check to see if clicked square is in the player's ship list
 function checkHit (boardCoordinate) {
     let foundShip = false;
-    let shipToAdd = null;  ///should move to ship add function////
     currentPlayer.shipLocations.forEach((shipObj, idx) => {
         if(shipObj.location.includes(boardCoordinate)) {
             foundShip = true;
@@ -368,10 +362,6 @@ function renderShot(boardCoordinate, targetSquareEl) {
         currentPlayer.recordMiss(); 
     }
     //update message bar 
-    //
-    //
-    //
-    // There has to be a cleaner way to do this
     if (currentPlayer === player1) {
         shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
         hitsEl.innerText = currentPlayer.hits;
