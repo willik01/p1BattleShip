@@ -60,11 +60,11 @@ class  Player {
         }
     }
     
-    recordWin() {
-        this.wins +=1;
+    recordWin() {  //Display this
+        this.wins +=1; 
     }
     
-    recordLoss() {
+    recordLoss() { //Display this
         this.losses +=1;
     }
     
@@ -79,55 +79,112 @@ class  Player {
 
 /*----- app's state (variables) -----*/
 //Instantiate payers
-let player1 = new Player ("Keith", NUM_SHOTS);
-let player2 = new Player ("Zev", NUM_SHOTS);
+let player1 = new Player ("Player One", NUM_SHOTS);
+let player2 = new Player ("Player Two", NUM_SHOTS);
 let currentPlayer = player1;
+let playingTwoPlayerGame = false;
 
 /*----- cached element references -----*/
+const resetBtnEl = document.getElementById('resetBtn');
+const numPlayerBtnEl = document.getElementById('numPlayer');
+const playerTurnNotifyEl = document.getElementById('playersTurn')
+
 //Board 1
 let shotsLeftEl = document.getElementById('sl');
 let hitsEl = document.getElementById('hits');
 let missesEl = document.getElementById('misses');
 const messageDisplayEl = document.getElementById('messageDisplay');
-const resetBtnEl = document.getElementById('resetBtn');
-const boardEl = document.getElementById('board');
+const boardEl = document.getElementById('board'); 
+const boardOneContainerEl = document.querySelector('.boardOneContainer');
+
+//Board 2
+let shotsLeftEl2 = document.getElementById('sl2');
+let hitsEl2 = document.getElementById('hits2');
+let missesEl2 = document.getElementById('misses2');
+const messageDisplayEl2 = document.getElementById('messageDisplay2');
+const boardTwoEl = document.getElementById('board2') 
+const boardTwoContainerEl = document.querySelector('.boardTwoContainer')
+
+const twoPlayerBoardEL = document.querySelector('.flexContainer') //Needed?
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
-boardEl.addEventListener('click', handleBoardClick);
-
+// boardEl.addEventListener('click', handleBoardClick);  //Not needed because eventListner set at parent of both boards
+numPlayerBtnEl.addEventListener('click', handleNumPlayerClick);
+twoPlayerBoardEL.addEventListener('click', handleBoardClick);
 /*----- functions -----*/
 
 function initGame(){ 
-    //first clear board
-    if (boardEl.hasChildNodes()) {
-        while (boardEl.hasChildNodes()) {
-            boardEl.removeChild(boardEl.firstChild);
-        }
-    }
-    createBoard(boardEl);
-    currentPlayer.reset(); 
-    messageDisplayEl.innerHTML = 'Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>'
+    // clear boards, create boards, place
+    clearBoard(boardEl);
+    clearBoard(boardTwoEl);
+    createBoard(boardEl, 1);
+    createBoard(boardTwoEl, 2);
+    randomlyPlaceShips(player1, "b1"); 
+    randomlyPlaceShips(player2, "b2"); 
+    player1.reset(); 
+    player2.reset();
+    boardOneContainerEl.style.pointerEvents = 'auto';
+    boardTwoContainerEl.style.pointerEvents = 'none';
+    messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
+    messageDisplayEl2.innerHTML = `${player2.name} Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span>`
+    playerTurnNotifyEl.innerHTML = ``
+    
     //reset element references for board refresh
     shotsLeftEl = document.getElementById('sl'); 
     hitsEl = document.getElementById('hits');
     missesEl = document.getElementById('misses');
-    randomlyPlaceShips(currentPlayer); 
-    boardEl.style.pointerEvents = 'auto';
+    shotsLeftEl2 = document.getElementById('sl2'); 
+    hitsEl2 = document.getElementById('hits2');
+    missesEl2 = document.getElementById('misses2');
+    // boardEl.style.pointerEvents = 'auto';
 }
 
-function createBoard(boardElement) { 
+// Switch between one & two player board
+function handleNumPlayerClick(){
+    numPlayerBtnEl.innerText = (numPlayerBtnEl.innerText === "Change to two player game")? 
+    setTwoPlayerBoard():setOnePlayerBoard(); 
+    initGame();
+}
+
+function setTwoPlayerBoard(){
+    console.log('setting TWO player board') //actions need to happen before returning text
+    boardTwoContainerEl.style.display = 'inline'; 
+    boardTwoContainerEl.style.pointerEvents = 'none';
+    playingTwoPlayerGame = true;
+    return "Change to one player game"
+}
+function setOnePlayerBoard(){
+    console.log('setting ONE player board') //actions need to happen before returning text
+    boardTwoContainerEl.style.display = 'none';
+    playingTwoPlayerGame = true;
+    return "Change to two player game"
+}
+function clearBoard(boardNameEl) { //this should use the same input parameter as create board
+    if (boardNameEl.hasChildNodes()) {
+        while (boardNameEl.hasChildNodes()) {
+            boardNameEl.removeChild(boardNameEl.firstChild);
+        }
+    }
+}
+
+function createBoard(boardElement, boardNumber) { //this should use the same input parameter as clear board
     for (i=1; i<=BOARD_HEIGHT; i++) {
         for (i2=1; i2<=BOARD_WIDTH; i2++) {
             const divEl = document.createElement("div");
             divEl.classList.add(`square`);
-            divEl.id = `r${i}c${i2}`;
+            divEl.classList.add(`delete`);
+            if (boardElement === boardEl) {
+                divEl.id = `b${boardNumber}r${i}c${i2}`;
+            } else {
+                divEl.id = `b${boardNumber}r${i}c${i2}`;
+            }
             boardElement.appendChild(divEl);
         }
     }
 }
 
-function randomlyPlaceShips(player) {
+function randomlyPlaceShips(player, playerBoard) {
     let shipIdx = 0;  
     let doNotIncrement = null;
     let startPositionX = null;
@@ -147,21 +204,21 @@ function randomlyPlaceShips(player) {
             startPositionX = getShipStartPositionX(BOARD_WIDTH);
             startPositionY = getShipStartPositionY(BOARD_HEIGHT - SHIPS[shipIdx].length);
         }
-
+        
         // record the new location based on a random start point and direction (down or right)
         //loop through length of ship to record locations for whole ship and build temp location array
         tempShipLocationArr.length = 0;
         for (let locationIdx=0; locationIdx<SHIPS[shipIdx].length; locationIdx++) {
             if (directionOfShip) {
-                tempShipLocationArr.push(`r${startPositionX + locationIdx}c${startPositionY}`)
+                tempShipLocationArr.push(`${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkOverlappingShips(`r${startPositionX + locationIdx}c${startPositionY}`)){
+                if (checkOverlappingShips(player, `${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)){
                     doNotIncrement = true;
                 }
             } else {
-                tempShipLocationArr.push(`r${startPositionX}c${startPositionY + locationIdx}`)
+                tempShipLocationArr.push(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
-                if (checkOverlappingShips(`r${startPositionX}c${startPositionY + locationIdx}`)){
+                if (checkOverlappingShips(player, `${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)){
                     doNotIncrement = true;
                 }
             }    
@@ -170,11 +227,21 @@ function randomlyPlaceShips(player) {
         if (!doNotIncrement) {
             player.shipLocations[shipIdx].location.length = 0;
             tempShipLocationArr.forEach(coordinate => {
-               player.shipLocations[shipIdx].location.push(coordinate);
+                player.shipLocations[shipIdx].location.push(coordinate);
             });
             shipIdx++;
         }
     };
+}
+//check to see if randomly chosen ship location conflicts with other placed ships
+function checkOverlappingShips (player, boardCoordinate) {
+    let foundShip = false;
+    player.shipLocations.forEach((shipObj) => {
+        if(shipObj.location.includes(boardCoordinate)) {
+            foundShip = true;
+        } 
+    });
+    return foundShip;
 }
 
 function getShipStartPositionX(boardWidth) {
@@ -195,19 +262,36 @@ function handleResetClick() {
 }
 
 function handleBoardClick(evt) {
-    //  console.log('evt.target: ', evt.target);
-    // if (!winner) {return};
-
-    if (evt.target.id !== 'board') {
+//handle clicks on the playing board
+    if (evt.target.className.indexOf('square') > -1) {
         //Check for hit
         renderShot(evt.target.id, evt.target);
+        console.log(evt.target.id, evt.target)
+        if (playingTwoPlayerGame === true) {
+            changePlayer();
+        }
     }
 }
+/// hightlight play borad and disable non-play board. 
+function changePlayer() {
+    currentPlayer = (currentPlayer === player1)? 
+    player2:player1; 
 
-function showShips(){
+    if (currentPlayer === player1) {
+        boardTwoContainerEl.style.pointerEvents = 'none';
+        boardOneContainerEl.style.pointerEvents = 'auto';
+    
+    } else {
+        boardTwoContainerEl.style.pointerEvents = 'auto';
+        boardOneContainerEl.style.pointerEvents = 'none';
+    }
+    playerTurnNotifyEl.innerHTML = `It is now ${currentPlayer.name}'s Turn`
+}
+
+function showShips(player){
 // end of game reveal of ships & cheat mode to display ship locations
-let shipToAdd = null;
-currentPlayer.shipLocations.forEach((ships, idx) => {
+// let shipToAdd = null;  //REMOVE: I think this is errant and should be removed. Commented out nov 16
+player.shipLocations.forEach((ships, idx) => {
     placeShip (ships.location[0], idx)
     });
 }
@@ -215,7 +299,6 @@ currentPlayer.shipLocations.forEach((ships, idx) => {
 //check to see if clicked square is in the player's ship list
 function checkHit (boardCoordinate) {
     let foundShip = false;
-    let shipToAdd = null;  ///should move to ship add function////
     currentPlayer.shipLocations.forEach((shipObj, idx) => {
         if(shipObj.location.includes(boardCoordinate)) {
             foundShip = true;
@@ -229,32 +312,32 @@ function checkHit (boardCoordinate) {
 }
 
 function placeShip (boardLocation, shipLocationsIdx) {
-    // console.log('image node? ', document.getElementById(boardLocation).firstChild.classList.contains('explosion'))           
     shipToAdd = document.createElement('img');
     shipToAdd.src = `assets/s_${SHIPS[shipLocationsIdx].name}.png`;
     shipToAdd.width = `${(SHIPS[shipLocationsIdx].length * 36)}`;
     shipToAdd.classList.add('shipsImage');   
     
     //check if there is a ship already there (for end of game ship display).
-    const boardSquareEl = document.getElementById(boardLocation);
-    if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
-        boardSquareEl.appendChild(shipToAdd);
-        if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
-            boardSquareEl.style.transform = 'rotate(90deg)';
+    const boardSquareEl = document.getElementById(boardLocation); 
+    // Does this outer if need to exist? Both sides are exactly the same. 
+    // if (currentPlayer === player1) {
+        if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+            boardSquareEl.appendChild(shipToAdd);
+            if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+                boardSquareEl.style.transform = 'rotate(90deg)';
+            }
         }
-    }
+    // } 
+    // else {
+    //     if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
+    //         boardSquareEl.appendChild(shipToAdd);
+    //         if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+    //             boardSquareEl.style.transform = 'rotate(90deg)';
+    //         }
+    //     }
+    // }
 }
 
-//check to see if randomly chosen ship location conflicts with other placed ships
-function checkOverlappingShips (boardCoordinate) {
-    let foundShip = false;
-    currentPlayer.shipLocations.forEach((shipObj) => {
-        if(shipObj.location.includes(boardCoordinate)) {
-            foundShip = true;
-        } 
-    });
-    return foundShip;
-}
 
 function showExplosion(imageURL, targetEl){
     let showExplosion = document.createElement('img');
@@ -278,21 +361,30 @@ function renderShot(boardCoordinate, targetSquareEl) {
         targetSquareEl.style.pointerEvents = 'none';
         currentPlayer.recordMiss(); 
     }
-    //update message bar
-    shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
-    hitsEl.innerText = currentPlayer.hits;
-    missesEl.innerText = currentPlayer.misses;
+    //update message bar 
+    if (currentPlayer === player1) {
+        shotsLeftEl.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+        hitsEl.innerText = currentPlayer.hits;
+        missesEl.innerText = currentPlayer.misses;
+    } else {
+        shotsLeftEl2.innerText = currentPlayer.shotsAllowed - currentPlayer.hits - currentPlayer.misses;
+        hitsEl2.innerText = currentPlayer.hits;
+        missesEl2.innerText = currentPlayer.misses;
+    }
     
     //determine if there is a win or loss
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordWin();  
-        // showShips();
+        //show opponents ships. Winner's ships already displayed. 
+        showShips((currentPlayer === player1) ? player2:player1);
         boardEl.style.pointerEvents = 'none';
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
+        //FIXXXXX: Player1 will always lose before player2 playes their 50th shot...
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         currentPlayer.recordLoss();
-        showShips();
+        showShips(player1);
+        showShips(player2);
         boardEl.style.pointerEvents = 'none';
     }
 }
