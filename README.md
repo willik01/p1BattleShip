@@ -27,8 +27,8 @@ Dive in and start clicking!
 
 1. Change logic so that a sucessful 'hit' does not count against your shot total 
 1. ~~Change logic to reveal a ship after it has been sunk (vs waiting until the end of the game)~~
-1. Develop 2 player game with two plaing boards
-1. Provide a modal or other method to ask player if they want 1 or 2 player game (this will affect initial layout)
+1. ~~Develop 2 player game with two plaing boards~~
+1. ~~Provide a modal or other method to ask player if they want 1 or 2 player game (this will affect initial layout)~~
 1. Allow players to 'place' their ships on their respective boards, preferably by clicking and dragging to the board. 
 
 
