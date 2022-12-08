@@ -390,7 +390,6 @@ function renderShot(boardCoordinate, targetSquareEl) {
         // boardEl.style.pointerEvents = 'none';
         boardOneContainerEl.style.pointerEvents = 'none';
         boardTwoContainerEl.style.pointerEvents = 'none';
-    
     }
 }
 
