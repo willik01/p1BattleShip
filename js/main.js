@@ -124,7 +124,6 @@ function initGame(){
     randomlyPlaceShips(player2, "b2"); 
     player1.reset(); 
     player2.reset();
-    boardEl.style.pointerEvents = 'auto';
     boardOneContainerEl.style.pointerEvents = 'auto';
     boardTwoContainerEl.style.pointerEvents = 'none';
     messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
@@ -138,7 +137,6 @@ function initGame(){
     shotsLeftEl2 = document.getElementById('sl2'); 
     hitsEl2 = document.getElementById('hits2');
     missesEl2 = document.getElementById('misses2');
-    // boardEl.style.pointerEvents = 'auto';
 }
 
 // Switch between one & two player board
@@ -266,11 +264,11 @@ function handleBoardClick(evt) {
 //handle clicks on the playing board
     if (evt.target.className.indexOf('square') > -1) {
         //Check for hit
-        renderShot(evt.target.id, evt.target);
-        console.log(evt.target.id, evt.target)
-        if (playingTwoPlayerGame === true) {
-            changePlayer();
+        if (renderShot(evt.target.id, evt.target)) {
+            if (playingTwoPlayerGame === true) {
+                changePlayer();
         }
+     }
     }
 }
 /// hightlight play borad and disable non-play board. 
@@ -379,15 +377,22 @@ function renderShot(boardCoordinate, targetSquareEl) {
         currentPlayer.recordWin();  
         //show opponents ships. Winner's ships already displayed. 
         showShips((currentPlayer === player1) ? player2:player1);
-        boardEl.style.pointerEvents = 'none';
+        boardOneContainerEl.style.pointerEvents = 'none';
+        boardTwoContainerEl.style.pointerEvents = 'none';    
+        //return false if end of game
+        return false;
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         //FIXXXXX: Player1 will always lose before player2 playes their 50th shot...
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         currentPlayer.recordLoss();
         showShips(player1);
         showShips(player2);
-        boardEl.style.pointerEvents = 'none';
+        boardOneContainerEl.style.pointerEvents = 'none';
+        boardTwoContainerEl.style.pointerEvents = 'none';    
+        //return false if end of game
+        return false;
     }
+    return true;
 }
 
 // START GAME
