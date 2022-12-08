@@ -124,7 +124,7 @@ function initGame(){
     randomlyPlaceShips(player2, "b2"); 
     player1.reset(); 
     player2.reset();
-    boardEl.style.pointerEvents = 'none';
+    boardEl.style.pointerEvents = 'auto';
     boardOneContainerEl.style.pointerEvents = 'auto';
     boardTwoContainerEl.style.pointerEvents = 'none';
     messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
