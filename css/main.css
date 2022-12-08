@@ -1,6 +1,7 @@
 body {
     text-align: center;
-    background-image: url("../assets/navyBattleGroup.png");
+    /* background-image: url("../assets/navyBattleGroup.png"); */
+    background-color: lightskyblue;
 }
 
 .boardTwoContainer {
