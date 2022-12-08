@@ -378,14 +378,19 @@ function renderShot(boardCoordinate, targetSquareEl) {
         currentPlayer.recordWin();  
         //show opponents ships. Winner's ships already displayed. 
         showShips((currentPlayer === player1) ? player2:player1);
-        boardEl.style.pointerEvents = 'none';
+        // boardEl.style.pointerEvents = 'none';
+        boardOneContainerEl.style.pointerEvents = 'none';
+        boardTwoContainerEl.style.pointerEvents = 'none';    
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         //FIXXXXX: Player1 will always lose before player2 playes their 50th shot...
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         currentPlayer.recordLoss();
         showShips(player1);
         showShips(player2);
-        boardEl.style.pointerEvents = 'none';
+        // boardEl.style.pointerEvents = 'none';
+        boardOneContainerEl.style.pointerEvents = 'none';
+        boardTwoContainerEl.style.pointerEvents = 'none';
+    
     }
 }
 
