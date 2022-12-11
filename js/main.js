@@ -128,7 +128,7 @@ function initGame(){
     boardTwoContainerEl.style.pointerEvents = 'none';
     messageDisplayEl.innerHTML = `${player1.name} Shots Left: <span id="sl">0</span>&nbsp;Hits: <span id="hits">0</span>&nbsp;Misses: <span id="misses">0</span>`
     messageDisplayEl2.innerHTML = `${player2.name} Shots Left: <span id="sl2">0</span>&nbsp;Hits: <span id="hits2">0</span>&nbsp;Misses: <span id="misses2">0</span>`
-    playerTurnNotifyEl.innerHTML = ``
+    playerTurnNotifyEl.innerHTML = `&nbsp;`
     
     //reset element references for board refresh
     shotsLeftEl = document.getElementById('sl'); 
@@ -374,21 +374,25 @@ function renderShot(boardCoordinate, targetSquareEl) {
     //determine if there is a win or loss
     if (currentPlayer.hits === 17) {
         messageDisplayEl.innerHTML = `<strong>Player WINS!!!!</strong>`;
+        messageDisplayEl2.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
         currentPlayer.recordWin();  
         //show opponents ships. Winner's ships already displayed. 
         showShips((currentPlayer === player1) ? player2:player1);
         boardOneContainerEl.style.pointerEvents = 'none';
         boardTwoContainerEl.style.pointerEvents = 'none';    
+        playerTurnNotifyEl.innerHTML = `&nbsp;`
         //return false if end of game
         return false;
     }else if ((currentPlayer.hits + currentPlayer.misses) === 50) {
         //FIXXXXX: Player1 will always lose before player2 playes their 50th shot...
         messageDisplayEl.innerHTML = `<strong>Player loses!  BOOOOO!!!</strong>`;
+        messageDisplayEl2.innerHTML = `<strong>Player WINS!!!!</strong>`;
         currentPlayer.recordLoss();
         showShips(player1);
         showShips(player2);
         boardOneContainerEl.style.pointerEvents = 'none';
         boardTwoContainerEl.style.pointerEvents = 'none';    
+        playerTurnNotifyEl.innerHTML = `&nbsp;`
         //return false if end of game
         return false;
     }
