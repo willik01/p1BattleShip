@@ -213,12 +213,14 @@ function randomlyPlaceShips(player, playerBoard) {
                 //check if new locaiton conflicts with other boats. If so, start over. 
                 if (checkOverlappingShips(player, `${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)){
                     doNotIncrement = true;
+                    locationIdx = 6;
                 }
             } else {
                 tempShipLocationArr.push(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
                 if (checkOverlappingShips(player, `${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)){
                     doNotIncrement = true;
+                    locationIdx = 6;
                 }
             }    
         };
@@ -291,7 +293,7 @@ function showShips(player){
 // end of game reveal of ships & cheat mode to display ship locations
 // let shipToAdd = null;  //REMOVE: I think this is errant and should be removed. Commented out nov 16
 player.shipLocations.forEach((ships, idx) => {
-    placeShip (ships.location[0], idx)
+    placeShip (ships.location[0], idx, player)
     });
 }
 
@@ -303,14 +305,14 @@ function checkHit (boardCoordinate) {
             foundShip = true;
             currentPlayer.recordShipHit(idx);
             if (currentPlayer.isShipSunk(idx)) {
-                placeShip (currentPlayer.shipLocations[idx].location[0], idx)
+                placeShip (currentPlayer.shipLocations[idx].location[0], idx, currentPlayer)
             }
         } 
     });
     return foundShip;
 }
 
-function placeShip (boardLocation, shipLocationsIdx) {
+function placeShip (boardLocation, shipLocationsIdx, player) {
     shipToAdd = document.createElement('img');
     shipToAdd.src = `assets/s_${SHIPS[shipLocationsIdx].name}.png`;
     shipToAdd.width = `${(SHIPS[shipLocationsIdx].length * 36)}`;
@@ -318,23 +320,12 @@ function placeShip (boardLocation, shipLocationsIdx) {
     
     //check if there is a ship already there (for end of game ship display).
     const boardSquareEl = document.getElementById(boardLocation); 
-    // Does this outer if need to exist? Both sides are exactly the same. 
-    // if (currentPlayer === player1) {
         if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
             boardSquareEl.appendChild(shipToAdd);
-            if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
+            if ( player.shipDirection[shipLocationsIdx].direction === 1 ) {
                 boardSquareEl.style.transform = 'rotate(90deg)';
             }
         }
-    // } 
-    // else {
-    //     if (boardSquareEl.querySelectorAll('img.shipsImage').length === 0){ //if no ships images, go ahead and append one
-    //         boardSquareEl.appendChild(shipToAdd);
-    //         if ( currentPlayer.shipDirection[shipLocationsIdx].direction === 1 ) {
-    //             boardSquareEl.style.transform = 'rotate(90deg)';
-    //         }
-    //     }
-    // }
 }
 
 
