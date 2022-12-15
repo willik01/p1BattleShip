@@ -15,7 +15,6 @@ class  Player {
     constructor(name, shotsAllowed) {
         this.name = name;
         this.shotsAllowed = shotsAllowed;
-        //this.shotsFired = 0;
         this.hits = 0;
         this.misses = 0;
         this.wins = 0;
@@ -109,7 +108,6 @@ const twoPlayerBoardEL = document.querySelector('.flexContainer') //Needed?
 
 /*----- event listeners -----*/
 resetBtnEl.addEventListener('click', handleResetClick);
-// boardEl.addEventListener('click', handleBoardClick);  //Not needed because eventListner set at parent of both boards
 numPlayerBtnEl.addEventListener('click', handleNumPlayerClick);
 twoPlayerBoardEL.addEventListener('click', handleBoardClick);
 /*----- functions -----*/
@@ -213,14 +211,12 @@ function randomlyPlaceShips(player, playerBoard) {
                 //check if new locaiton conflicts with other boats. If so, start over. 
                 if (checkOverlappingShips(player, `${playerBoard}r${startPositionX + locationIdx}c${startPositionY}`)){
                     doNotIncrement = true;
-                    locationIdx = 6;
                 }
             } else {
                 tempShipLocationArr.push(`${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)
                 //check if new locaiton conflicts with other boats. If so, start over. 
                 if (checkOverlappingShips(player, `${playerBoard}r${startPositionX}c${startPositionY + locationIdx}`)){
                     doNotIncrement = true;
-                    locationIdx = 6;
                 }
             }    
         };
@@ -291,7 +287,6 @@ function changePlayer() {
 
 function showShips(player){
 // end of game reveal of ships & cheat mode to display ship locations
-// let shipToAdd = null;  //REMOVE: I think this is errant and should be removed. Commented out nov 16
 player.shipLocations.forEach((ships, idx) => {
     placeShip (ships.location[0], idx, player)
     });
@@ -327,7 +322,6 @@ function placeShip (boardLocation, shipLocationsIdx, player) {
             }
         }
 }
-
 
 function showExplosion(imageURL, targetEl){
     let showExplosion = document.createElement('img');
